@@ -124,7 +124,6 @@ PM_df = PM_df.reset_index(drop=True)
 print('low % obs removed: ',n_obs_low_pct, ', excluded events obs removed: ',n_obs_exl_events,', sum: ',n_obs_exl_events + n_obs_low_pct)
 print('total obs before: ',len(PM_df_all),', after: ',len(PM_df),', difference: ', len(PM_df_all) - len(PM_df))
 print('check all excluded events removed (should only say included and none here):',np.unique(PM_df['Event Type']))
-hi=bye
 ###################################################################################################
 # check that duplicate observations in each file actually are duplicates (within rounding errors)
 ###################################################################################################
@@ -185,7 +184,7 @@ print('file saved, making plots')
 
 ###################################################################################################
 # plot sites in December to check for file completeness (if there are there sites missing for an
-# entire state .. red flag that the data is incomplete) states have 6 months to report data to the EPA
+# entire state .. red flag that the data is incomplete) states have 6 months to report data to the EPA but can take longer for nFRM data
 ###################################################################################################
 mean_dec_obs = np.nanmean(sPM[-32:,:],axis=0)
 tinds = np.where(np.isnan(mean_dec_obs)==False)

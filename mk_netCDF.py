@@ -17,7 +17,7 @@ from cartopy.feature import NaturalEarthFeature
 # user inputs
 ###################################################################################################
 # set year
-year = 2006
+year = 2018
 
 # file paths for input data
 # output from krige_aqs_US.py
@@ -33,9 +33,9 @@ out_fp = '/home/kaodell/nasa_fires/Lipner_fullUSkrige/datafiles/krigedPM25_06-19
 fig_fp = '/home/kaodell/nasa_fires/Lipner_fullUSkrige/datafiles/krigedPM25_06-19_v2/'
 
 # file descriptions
-in_bk_desc = '_v2_statfixmedian'
+in_bk_desc = '_v2_statfixmean'
 in_kPM_desc = '_v2_statfix'
-out_desc = '_v2_statfix_medbk'
+out_desc = '_v2_statfix_meanbk'
 
 ###################################################################################################
 # user defined functions
@@ -167,22 +167,24 @@ ns_lat_nc = nc_w_fid.createVariable('ns_lat', 'f8', ('nslonx','nslony'))
 
 PM25_nc = nc_w_fid.createVariable('PM25', 'f8', ('date', 'lonx','lony'))
 
-PM25_background_nc = nc_w_fid.createVariable('Background PM25', 'f8', ('date', 'lonx', 'lony'))
+PM25_background_nc = nc_w_fid.createVariable('Background_PM25', 'f8', ('date', 'lonx', 'lony'))
 
-HMS_smoke_nc = nc_w_fid.createVariable('HMS Smoke', 'f8', ('date', 'lonx', 'lony'))
+HMS_smoke_nc = nc_w_fid.createVariable('HMS_Smoke', 'f8', ('date', 'lonx', 'lony'))
 
 
-site_lon_nc = nc_w_fid.createVariable('testing sites longitudes', 'f8', ('nsites'))
+site_lon_nc = nc_w_fid.createVariable('testing_sites_longitudes', 'f8', ('nsites'))
 
-site_lat_nc = nc_w_fid.createVariable('testing sites latitudes', 'f8', ('nsites'))
+site_lat_nc = nc_w_fid.createVariable('testing_sites_latitudes', 'f8', ('nsites'))
 
-site_rsq_nc = nc_w_fid.createVariable('r-squared', 'f8', ('nsites'))
+site_rsq_nc = nc_w_fid.createVariable('r_squared', 'f8', ('nsites'))
 
-site_MB_nc = nc_w_fid.createVariable('mean bias', 'f8', ('nsites'))
+site_MB_nc = nc_w_fid.createVariable('mean_bias', 'f8', ('nsites'))
 
-site_MAE_nc = nc_w_fid.createVariable('mean absolute error', 'f8', ('nsites'))
+site_MAE_nc = nc_w_fid.createVariable('mean_absolute_error', 'f8', ('nsites'))
 
 site_slope_nc = nc_w_fid.createVariable('slope', 'f8', ('nsites'))
+
+nobs_nc = nc_w_fid.createVariable('nobs', 'f8', ('nsites'))
 
 # add variable attributes 
 doy_nc.setncatts({'units':'date','long_name':'day of year',\
@@ -219,8 +221,10 @@ site_MB_nc.setncatts({'units':'ug m-3','long_name':'mean bias',\
                'var_desc':'mean bias for LOOCV against sfc monitors'})
 site_MAE_nc.setncatts({'units':'ug m-3','long_name':'mean absolute error',\
                'var_desc':'mean absolute error for LOOCV against sfc monitors'})
-#site_slope_nc.setncatts({'units':'unitless','long_name':'linear regression slope',\
-#               'var_desc':'slope for LOOCV against sfc monitors'})
+site_slope_nc.setncatts({'units':'unitless','long_name':'linear regression slope',\
+               'var_desc':'slope for LOOCV against sfc monitors'})
+nobs_nc.setncatts({'units':'unitless','long_name':'number of site observations',\
+               'var_desc':'number of monitor observations available for LOOCV against sfc monitors'})
 
 # assign data to the variables
 doy_nc[:] = np.arange(0,kPM.shape[0])
@@ -239,6 +243,7 @@ site_rsq_nc[:] = site_rsq
 site_MB_nc[:] = site_MB
 site_MAE_nc[:] = site_MAE
 site_slope_nc[:] = site_slope
+nobs_nc[:] = site_nobs
 nc_w_fid.close()
 
 print('data saved, making figures')
@@ -247,8 +252,8 @@ print('data saved, making figures')
 ###################################################################################################
 
 # 1) plot map of R2, MB, MAE, and slope at sites from LOOCV w title giving overall stats (add slope once we have it)
-# only plot sites with over 30 obs
-tinds = np.where(site_nobs > 30.0)[0] 
+# only plot sites with over 60 obs
+tinds = np.where(site_nobs > 60.0)[0] 
 
 plot_data = [site_rsq[tinds], site_MB[tinds], site_MAE[tinds],site_slope[tinds]]
 titles = ['site R2 \n overall: '+str(rsq)[:4],'site MB \n overall: '+str(MB)[:5],'site MAE \n overall: '+str(MAE)[:5],
@@ -256,7 +261,6 @@ titles = ['site R2 \n overall: '+str(rsq)[:4],'site MB \n overall: '+str(MB)[:5]
 fig, axarr = plt.subplots(nrows=2,ncols=2,subplot_kw={'projection':ccrs.PlateCarree()})
 plt.tight_layout()
 axlist = axarr.flatten()
-# after fixing nobs, limit this to only plot sites with > x observations
 # rsq
 ax = axlist[0]
 mk_map(ax)
@@ -266,33 +270,33 @@ cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[0])
 # mean bias
 ax = axlist[1]
-norm = mplt.colors.TwoSlopeNorm(vmin=min(plot_data[1]), vcenter=0, vmax=max(plot_data[1]))
+norm = mplt.colors.TwoSlopeNorm(vmin=-5, vcenter=0, vmax=5)
 mk_map(ax)
 cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[1],s=10,cmap='bwr',norm=norm)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35)
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35,extend='both')
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[1])
 # mean absolute error
 ax = axlist[2]
 mk_map(ax)
-cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[2],s=10)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35)
+cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[2],s=10,vmin=0,vmax=5)
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35,extend='max')
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[2])
 # slope
 ax = axlist[3]
 mk_map(ax)
-cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[3],s=10)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35)
+cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[3],s=10,vmin=0.5,vmax=1.5)
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35,extend='both')
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[3])
 fig.suptitle('kriging stats ' +str(year))
-
+#plt.tight_layout()
 plt.savefig(fig_fp +'kriging_stats_'+ str(year) + out_desc+'.png')
 
 # 2) kPM annual average, annual smoke, annual nosmoke
 # some quick calculations (note not removing negative backgrounds or total PM here, which we typically do in the full smoke calc)
-'''
+
 kPM_anavg = np.nanmean(kPM,axis=0)
 nosmoke = np.where(HMS_smoke==0,kPM,kPMbackground)
 nosmoke_anavg = np.nanmean(nosmoke,axis=0)
@@ -365,5 +369,52 @@ fig.suptitle('daily PM2.5 ' +str(year))
 plt.savefig(fig_fp +'kriging_daily_plot_examplesB_'+ str(year) + out_desc+'.png')
 plt.show()
 
+# Distribution of total PM2.5 and background PM2.5
+
+# remove over ocean values
+state_grid = np.load('state_grid.npy') # assigns grid cells to states
+US_inds = np.where(state_grid!='NA')
+kPM_plot = kPM[:,US_inds[0],US_inds[1]].flatten()
+bkPM_plot = kPMbackground[:,US_inds[0],US_inds[0]].flatten()
+
+# plot
+fig, axs = plt.subplots(2,1)
+ax=axs.flatten()
+if np.max(kPM_plot) < 100:
+    if np.min(kPM_plot) > -5:
+        ax[0].hist(kPM_plot, bins=[np.min(kPM_plot),0,5,10,20,30,40,50,np.max(kPM_plot)])
+    else:
+        ax[0].hist(kPM_plot, bins=[np.min(kPM_plot),-5,0,5,10,20,30,40,50,np.max(kPM_plot)])
+else:
+    if np.min(kPM_plot) > -5:
+        ax[0].hist(kPM_plot, bins=[np.min(kPM_plot),0,5,10,20,30,40,50,100,np.max(kPM_plot)])
+    else:
+        ax[0].hist(kPM_plot, bins=[np.min(kPM_plot),-5,0,5,10,20,30,40,50,100,np.max(kPM_plot)])
+ax[0].set_xlabel('daily-average PM2.5 [ug m-3]')
+ax[0].set_ylabel('count')
+ax[0].set_yscale('log')
+ax[0].set_title('total PM2.5 ' +str(year) + ' histogram')
+if np.min(bkPM_plot)< 0:
+    if np.max(bkPM_plot)<12:
+        ax[1].hist(bkPM_plot, bins=[np.min(bkPM_plot),0,4,6,8,10,np.max(bkPM_plot)])
+    else:
+        ax[1].hist(bkPM_plot, bins=[np.min(bkPM_plot),0,4,6,8,10,12,np.max(bkPM_plot)])
+elif np.min(bkPM_plot)< 4:
+    if np.max(bkPM_plot)<12:
+        ax[1].hist(bkPM_plot, bins=[np.min(bkPM_plot),4,6,8,10,np.max(bkPM_plot)])
+    else:
+        ax[1].hist(bkPM_plot, bins=[np.min(bkPM_plot),4,6,8,10,12,np.max(bkPM_plot)])
+else:
+    if np.max(bkPM_plot)<12:
+        ax[1].hist(bkPM_plot, bins=[np.min(bkPM_plot),6,8,10,np.max(bkPM_plot)])
+    else:
+        ax[1].hist(bkPM_plot, bins=[np.min(bkPM_plot),6,8,10,12,np.max(bkPM_plot)])
+ax[1].set_xlabel('background PM2.5 [ug m-3]')
+ax[1].set_ylabel('count')
+ax[1].set_title('background PM2.5 ' +str(year) + ' histogram')
+plt.tight_layout()
+plt.savefig(fig_fp +'kriging_histrogram_'+ str(year) + out_desc+'.png')
+plt.show()
+
 # In addition to these plots, it is reccommended to look at the output netCDF file variables using ncview
-'''
+

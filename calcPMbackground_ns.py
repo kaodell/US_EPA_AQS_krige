@@ -25,11 +25,11 @@ from cartopy.feature import NaturalEarthFeature
 # user inputs
 ###################################################################################################
 # set year
-year = 2008
+year = 2009
 
 # select background averaging method
-#avg_method = 'mean' # more conservative approach
-avg_method = 'mean' # used in publications
+avg_method = 'mean' 
+#avg_method = 'median' # used in publications
 
 # specify file locations
 # location of folder with sPM npz files and kPM npz files output from process_sfc_obs_update.py and kriqe_aqs_US.py, respectively
@@ -153,7 +153,7 @@ for k in range(0,4):
             elif avg_method == 'mean':
                 #print('taking seasonal mean')
                 background_PM[k,i,j] = np.mean(no_smoke_PM)
-            if len(no_smoke_PM) < 30:
+            if len(no_smoke_PM) < 20:
                 # check that there are sufficient days for the background estimate
                 # still assign background here, but check figures to make sure it looks reasonable
                 print('few nosmoke days at inds:' + str(k) + ' ' + str(i) + ' '+ str(j))
