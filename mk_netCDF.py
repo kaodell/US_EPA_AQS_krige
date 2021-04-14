@@ -17,7 +17,7 @@ from cartopy.feature import NaturalEarthFeature
 # user inputs
 ###################################################################################################
 # set year
-year = 2018
+year = 2006
 
 # file paths for input data
 # output from krige_aqs_US.py
@@ -43,10 +43,12 @@ out_desc = '_v2_statfix_meanbk'
 # for plotting
 def mk_map(ax):
     ax.patch.set_visible(False)
+    ax.axis('off')
     shapename = 'admin_1_states_provinces_lakes_shp'
     states_shp = shpreader.natural_earth(resolution='110m',category='cultural', name=shapename)
     facecolor = (0, 0, 0, 0)
     edgecolor = 'black'
+    frameon = False
     for state in shpreader.Reader(states_shp).geometries():
         ax.add_geometries([state], ccrs.PlateCarree(),
                       facecolor=facecolor, edgecolor=edgecolor)
@@ -247,6 +249,7 @@ nobs_nc[:] = site_nobs
 nc_w_fid.close()
 
 print('data saved, making figures')
+
 ###################################################################################################
 # Make figures
 ###################################################################################################
@@ -258,14 +261,14 @@ tinds = np.where(site_nobs > 60.0)[0]
 plot_data = [site_rsq[tinds], site_MB[tinds], site_MAE[tinds],site_slope[tinds]]
 titles = ['site R2 \n overall: '+str(rsq)[:4],'site MB \n overall: '+str(MB)[:5],'site MAE \n overall: '+str(MAE)[:5],
           'site slope \n overall: '+str(slope)[:4]]
-fig, axarr = plt.subplots(nrows=2,ncols=2,subplot_kw={'projection':ccrs.PlateCarree()})
-plt.tight_layout()
+fig, axarr = plt.subplots(nrows=2,ncols=2,subplot_kw={'projection':ccrs.PlateCarree()},
+                          figsize=[10.,8.])
 axlist = axarr.flatten()
 # rsq
 ax = axlist[0]
 mk_map(ax)
 cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[0],s=10,cmap='jet',vmin=0,vmax=1)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35)
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.7)
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[0])
 # mean bias
@@ -273,26 +276,27 @@ ax = axlist[1]
 norm = mplt.colors.TwoSlopeNorm(vmin=-5, vcenter=0, vmax=5)
 mk_map(ax)
 cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[1],s=10,cmap='bwr',norm=norm)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35,extend='both')
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.7,extend='both')
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[1])
 # mean absolute error
 ax = axlist[2]
 mk_map(ax)
 cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[2],s=10,vmin=0,vmax=5)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35,extend='max')
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.7,extend='max')
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[2])
 # slope
 ax = axlist[3]
 mk_map(ax)
 cs = ax.scatter(slon[tinds],slat[tinds],c=plot_data[3],s=10,vmin=0.5,vmax=1.5)
-cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.35,extend='both')
+cax,kw = mplt.colorbar.make_axes(ax,location='bottom',shrink=0.7,extend='both')
 cbar = fig.colorbar(cs,cax=cax,**kw)
 ax.set_title(titles[3])
 fig.suptitle('kriging stats ' +str(year))
-#plt.tight_layout()
+plt.subplots_adjust(top=1.0,bottom=0.185,left=0.0,right=1.0,hspace=0.075,wspace=0.0)
 plt.savefig(fig_fp +'kriging_stats_'+ str(year) + out_desc+'.png')
+plt.show()
 
 # 2) kPM annual average, annual smoke, annual nosmoke
 # some quick calculations (note not removing negative backgrounds or total PM here, which we typically do in the full smoke calc)
@@ -417,4 +421,3 @@ plt.savefig(fig_fp +'kriging_histrogram_'+ str(year) + out_desc+'.png')
 plt.show()
 
 # In addition to these plots, it is reccommended to look at the output netCDF file variables using ncview
-
