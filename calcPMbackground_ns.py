@@ -5,8 +5,7 @@
 # 08/08/17
 # version 2: 12/16/20, updated to python 3 and changed file i/o to load the npz files instead of netCDF
 #			this version comments out the site background check, but it should be uncommented 
-#			for running new years. Plotting methods need to be updated to cartopy. also
-#                       changed seasons to JFM, AMJ, JAS, OND (from DJF, MAM, JJA, SON). renamed calcPMbackground_ns.py
+#			for running new years. Changed seasons to JFM, AMJ, JAS, OND (from DJF, MAM, JJA, SON). renamed calcPMbackground_ns.py
 ###################################################################################################
 #load important modules
 import numpy as np
