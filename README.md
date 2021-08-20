@@ -41,7 +41,7 @@ This script reads in the output from krige_aqs_US.py and calcPMbackground_ns.py 
 file containing the krigged PM2.5, gridded HMS, background PM2.5, and LOOCV statistics. These files were uploaded to the Mountain Scholar data repository
 (https://doi.org/10.25675/10217/230602). This code also outputs figures of the data to check for obvious errors. 
 
-References
+# References
 Lassman, W.; Ford, B.; Gan, R. W.; Pfister, G.; Magzamen, S.; Fischer, E. V.; Pierce, J. R. 
 Spatial and Temporal Estimates of Population Exposure to Wildfire Smoke during the Washington 
 State 2012 Wildfire Season Using Blended Model, Satellite, and In-Situ Data. GeoHealth 2017, 2017GH000049. 
