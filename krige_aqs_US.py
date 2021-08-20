@@ -1,6 +1,6 @@
 #krige_aqs_US.py
 #	Reading aqs data from given year and kriging to full US wrf-chem grid 
-#written by: Kate O'Dell 
+#written by: Kate O'Dell, modified code originally written by William Lassman
 #version history: 1.0 initial 09/30/16 
 #		 2.0 re-written for 2015 data 10/25/16
 #		 3.0 re-written for 2013 Oregon (renamed from krige_aqs_2015 to krige_aqs_OR2013) 1/16/17
