@@ -22,7 +22,7 @@ modified from kriging and LOOCV python code written by William Lassman
 This script reads in the npz output file from process_sfc_obs_update.py and kriges the surface PM2.5 concentrations to a 15 x 15 km WRF-chem grid 
 across the full contiguous US. Grid details are available in the data repository. For details on this kriging process and how the kriging 
 parameters were determined see Lassman et al. (2017) and O'Dell et al. (2019) (or if you really want all the gory details, 
-refer to my masters thesis - https://hdl.handle.net/10217/193183).This code outputs a date x grid_X x grid_Y array of spatially 
+refer to my masters thesis - https://hdl.handle.net/10217/193183 ). This code outputs a date x grid_X x grid_Y array of spatially 
 interpolated surface PM2.5 concentrations and leave-one-out cross validation (LOOCV) statistics. PM2.5 concentrations on the grid outside 
 the contiguous US should be discarded as they are extrapolated. With the LOOCV this code takes several days to run for one year. 
 Without the LOOCV it takes less than a day. 
