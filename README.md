@@ -39,7 +39,7 @@ please see O'Dell et al. (2019) and O'Dell et al. (2021).
 written by Katelyn O'Dell
 This script reads in the output from krige_aqs_US.py and calcPMbackground_ns.py and the gridded NOAA HMS smoke from Bonne Ford. It outputs a netCDF
 file containing the krigged PM2.5, gridded HMS, background PM2.5, and LOOCV statistics. These files were uploaded to the Mountain Scholar data repository
-(https://doi.org/10.25675/10217/230602). This code also outputs figures of the data to check for obvious errors. 
+( https://doi.org/10.25675/10217/230602 ). This code also outputs figures of the data to check for obvious errors. 
 
 # References
 Lassman, W.; Ford, B.; Gan, R. W.; Pfister, G.; Magzamen, S.; Fischer, E. V.; Pierce, J. R. 
