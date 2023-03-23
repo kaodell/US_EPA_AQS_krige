@@ -54,5 +54,6 @@ O'Dell, K., K. Bilsback, B. Ford, S. E. Martenies, S. Magzamen, E. V. Fischer an
 Estimated Mortality and Morbidity Attributable to Smoke Plumes in the US: Not Just a Western US Problem, GeoHealth, 
 DOI: 10.1029/2021GH000457
 
-
+Note for future code users
+# 03.32.23 - I have since realized I have a few instances in the process_sfc_obs_update.py code of setting pandas values with chained indexing (which is ill-advised as it may not often work as exptected). I re-looked over this code and the instances in which I had those issues I had confirmed the code was working as expected or the output of the code indicates it worked as expected. In addition, this only impacted years 2005 and 2006. However, if anyone uses this code in the future for those years, those istances should be resolved. See here for details on this warning in pandas: https://pandas.pydata.org/docs/user_guide/indexing.html#indexing-view-versus-copy.
 
